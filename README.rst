@@ -6,16 +6,16 @@ Cosmoscope
 .. image:: https://img.shields.io/pypi/v/cosmoscope.svg
         :target: https://pypi.python.org/pypi/cosmoscope
 
-.. image:: https://img.shields.io/travis/nmearl/cosmoscope.svg
-        :target: https://travis-ci.org/nmearl/cosmoscope
+.. image:: https://img.shields.io/travis/cosmoscope/cosmoscope.svg
+        :target: https://travis-ci.org/cosmoscope/cosmoscope
 
 .. image:: https://readthedocs.org/projects/cosmoscope/badge/?version=latest
         :target: https://cosmoscope.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
 
-.. image:: https://pyup.io/repos/github/nmearl/cosmoscope/shield.svg
-     :target: https://pyup.io/repos/github/nmearl/cosmoscope/
+.. image:: https://pyup.io/repos/github/cosmoscope/cosmoscope/shield.svg
+     :target: https://pyup.io/repos/github/cosmoscope/cosmoscope/
      :alt: Updates
 
 
