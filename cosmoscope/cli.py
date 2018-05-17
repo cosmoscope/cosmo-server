@@ -4,14 +4,15 @@
 import sys
 import click
 
+from .core.server import launch
+
 
 @click.command()
-def main(args=None):
-    """Console script for cosmoscope."""
-    click.echo("Replace this message by putting your code into "
-               "cosmoscope.cli.main")
-    click.echo("See click documentation at http://click.pocoo.org/")
-    return 0
+@click.option('--server-address', default="tcp://127.0.0.1:4242", help="Server IP address.")
+@click.option('--publisher-address', default="tcp://127.0.0.1:4243", help="Publisher IP address.")
+def main(server_address=None, publisher_address=None):
+    """Console interface for the cosmoscope server."""
+    launch(server_address, publisher_address)
 
 
 if __name__ == "__main__":
