@@ -26,7 +26,7 @@ def reversible_operation(name):
         # from types import MethodType
         # setattr(ServerAPI, label or func.__name__, MethodType(func, ServerAPI))
 
-        logging.info("[server] Function %s has been added to server api.",
+        logging.info("Function %s has been added to server api.",
                      func_op.__name__)
 
         return func_op
