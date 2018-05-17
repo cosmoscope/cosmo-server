@@ -1,10 +1,12 @@
 import logging
 
+import signal
 import gevent
 import msgpack
 from zerorpc import Publisher, Puller, Pusher, Server
+import numpy as np
 
-from ..storage.store import Store
+from .store import Store
 from .data import Data
 from ..utils.singleton import Singleton
 
@@ -24,7 +26,7 @@ class ServerAPI(metaclass=Singleton):
         """
         Undo an operation popping from the stack and calling its `undo` method.
         """
-        from .operations import Operation
+        from .operation import Operation
 
         Operation.pop().undo()
 
@@ -32,25 +34,55 @@ class ServerAPI(metaclass=Singleton):
         """
         Call the `redo` method on the latest operation to be added to stack.
         """
-        from .operations import Operation
+        from .operation import Operation
 
         Operation.redo()
 
-    def testing(self, msg):
-        print("Received 'testing' call on server")
+    def register(self, msg):
+        pass
         # self.publisher.testing("This is a test on client.")
 
+    def load_data(self, path, format):
+        """
+        Load a data file given path and format.
+        """
+        import astropy.units as u
+        # data = Data.read(path, format=format)
+        data = Data(np.random.sample(100) * u.Jy, spectral_axis=np.linspace(1100, 1200, 100) * u.AA)
 
-def launch(server_ip=None, client_ip=None):
+        self.publisher.data_loaded(data.identifier)
+
+    def query_loader_formats(self):
+        """
+        Returns a list of available data loader formats.
+        """
+        from specutils import Spectrum1D
+        from astropy.io import registry as io_registry
+
+        all_formats = io_registry.get_formats(Spectrum1D)['Format']
+
+        return all_formats
+
+    def query_data(self, identifier, return_values):
+        data = Store()[identifier]
+
+        data_dict = Data.decode(Data.encode(data, unpicklable=False))
+
+        return Data.encode(data)
+
+
+def launch(server_ip=None, client_ip=None, block=True):
     server_ip = server_ip or "tcp://127.0.0.1:4242"
     client_ip = client_ip or "tcp://127.0.0.1:4243"
 
     # Setup the puller service
-    server = Server(ServerAPI(server_ip))
+    server_api = ServerAPI(server_ip)
+    server = Server(server_api)
     server.bind(client_ip)
 
-    gevent.spawn(server.run)
-
     logging.info(
-        "[server] Server is now listening on %s and sending on %s.",
+        "Server is now listening on %s and sending on %s.",
         client_ip, server_ip)
+
+    gevent.signal(signal.SIGINT, server.stop)
+    server.run() if block else gevent.spawn(server.run)
