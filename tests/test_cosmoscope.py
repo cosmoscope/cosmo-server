@@ -7,7 +7,6 @@ import pytest
 
 from click.testing import CliRunner
 
-from cosmoscope import cosmoscope
 from cosmoscope import cli
 
 
