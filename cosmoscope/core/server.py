@@ -66,10 +66,16 @@ class ServerAPI(metaclass=Singleton):
     def query_data(self, identifier, return_values):
         data = Store()[identifier]
 
-        data_dict = Data.decode(Data.encode(data, unpicklable=False))
+        data_dict = {
+            'name': data.name,
+            'identifier': data.identifier,
+            'spectral_axis': data.spectral_axis.value.tolist(),
+            'spectral_axis_unit': data.spectral_axis.unit.to_string(),
+            'flux': data.flux.value.tolist(),
+            'unit': data.flux.unit.to_string()
+        }
 
-        return Data.encode(data)
-
+        return data_dict
 
 def launch(server_ip=None, client_ip=None, block=True):
     server_ip = server_ip or "tcp://127.0.0.1:4242"

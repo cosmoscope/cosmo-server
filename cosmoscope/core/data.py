@@ -99,7 +99,7 @@ class SpectralFrameHandler(jsonpickle.handlers.BaseHandler):
         return data
 
     def restore(self, obj):
-        spec_frame = SpectralFrame()z
+        spec_frame = SpectralFrame()
         spec_frame.__dict__ = obj['__dict__']
         spec_frame._unit = tuple([Unit(x) for x in obj['__dict__']['_unit']])
         return spec_frame
