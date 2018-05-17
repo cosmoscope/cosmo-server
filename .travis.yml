@@ -19,7 +19,7 @@ deploy:
       SXkyWUVRQUJSSFZsWXh1MERSNC83WU5yTzlqNlZNZzNnQ0hUaHdLNGtUZ1huVWFOcStZVTZFWnc9
   true:
     python: 3.6
-    repo: nmearl/cosmoscope
+    repo: cosmoscope/cosmoscope
     tags: true
 install: pip install -U tox-travis
 language: python
