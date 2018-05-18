@@ -8,12 +8,12 @@ import numpy as np
 
 from .store import Store
 from .data import Data
-from ..utils.singleton import Singleton
+from .operations.operation import Operation
 
 __all__ = ['ServerAPI']
 
 
-class ServerAPI(Server):#, metaclass=Singleton):
+class ServerAPI(Server):
     """
     RPC server class.
     """
@@ -26,16 +26,12 @@ class ServerAPI(Server):#, metaclass=Singleton):
         """
         Undo an operation popping from the stack and calling its `undo` method.
         """
-        from .operation import Operation
-
         Operation.pop().undo()
 
     def redo(self):
         """
         Call the `redo` method on the latest operation to be added to stack.
         """
-        from .operation import Operation
-
         Operation.redo()
 
     def register(self, msg):

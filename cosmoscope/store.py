@@ -4,17 +4,34 @@ import logging
 import uuid
 import os
 import sys
+import glob
 
 import pickle
 import datetime
 
-from ..core.data import Data
-from ..utils.singleton import Singleton
+from .data import Data
 
 SAVE_PATH = os.path.join(os.path.expanduser("~/.cosmoscope"), "sessions")
 
 
-class Store(dict, metaclass=Singleton):
+class StoreRegistry(type):
+    """
+    When added to a class, automatically adds instances of that class to the
+    central storage database.
+    """
+    def __call__(cls, *args, **kwargs):
+        instance = super(StoreRegistry, cls).__call__(*args, **kwargs)
+
+        # Assign the instance a unique identifier
+        instance._identifier = str(uuid.uuid4())
+
+        # Register this data instance on the store
+        store.register(instance)
+
+        return instance
+
+
+class Store(dict):
     """
     The store is the centralized location for managing and propagating changes
     throughout the application.
@@ -30,11 +47,25 @@ class Store(dict, metaclass=Singleton):
         # serialized data
         self._session_id = str(datetime.datetime.utcnow())
 
-    def open(self, name):
+    def open(self, name=None):
         """
         Opens a saved document and loads it as the current session.
         """
-        open_path = os.path.join(SAVE_PATH, name)
+        # If no filename given, load the latest stored session
+        if name is None:
+            session_files = glob.glob(os.path.join(SAVE_PATH, '*.csm'))
+
+            # If there are no stored session files, raise an error
+            if len(session_files) == 0:
+                raise LookupError("No filename provided and no stored "
+                                  "sessions to load.")
+
+            # Get the most recent file
+            recent_session_file = max(session_files, key=os.path.getctime)
+
+            open_path = os.path.join(SAVE_PATH, recent_session_file)
+        else:
+            open_path = os.path.join(SAVE_PATH, name)
 
         if os.path.exists(open_path):
             with open(open_path, 'rb') as f:
@@ -42,11 +73,11 @@ class Store(dict, metaclass=Singleton):
         else:
             raise IOError("No file named '%s'.", name)
 
-    def save(self, file_name=None):
+    def save(self, filename=None):
         """
         Serializes the current document to the users' drive.
         """
-        file_path = os.path.join(SAVE_PATH, file_name or self._session_id)
+        file_path = os.path.join(SAVE_PATH, "{:s}.csm".format(filename or self._session_id))
 
         if not os.path.exists(SAVE_PATH):
             os.mkdir(SAVE_PATH)
@@ -117,3 +148,7 @@ class Store(dict, metaclass=Singleton):
             logging.info(
                 "Data object with id %s has been removed from database.",
                 identifier)
+
+
+# Initialize the cosmoscope store
+store = Store()

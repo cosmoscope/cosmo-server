@@ -8,11 +8,11 @@ from astropy.units import Quantity, Unit
 from gwcs.coordinate_frames import SpectralFrame
 from specutils import Spectrum1D
 
-from ..interfaces.mixins import StoreRegistryMixin
+from .mixins import StoreRegistry
 
 __all__ = ['Data']
 
-_StoreRegistryProxy = type('StoreRegistryProxy', (StoreRegistryMixin, ABCMeta), {})
+_StoreRegistryProxy = type('StoreRegistryProxy', (StoreRegistry, ABCMeta), {})
 
 
 class Data(Spectrum1D, metaclass=_StoreRegistryProxy):

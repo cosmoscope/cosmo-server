@@ -5,6 +5,9 @@ import os
 import sys
 import importlib.util as util
 
+# Initialize the cosmoscope store by importing the module
+from .store import Store
+
 __author__ = """Nicholas Earl"""
 __email__ = 'contact@nicholasearl.me'
 __version__ = '0.1.0'

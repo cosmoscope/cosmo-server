@@ -2,7 +2,7 @@
 import sys
 import click
 
-from .core.server import launch
+from .server import launch
 
 
 @click.command()
