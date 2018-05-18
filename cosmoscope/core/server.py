@@ -13,14 +13,14 @@ from ..utils.singleton import Singleton
 __all__ = ['ServerAPI']
 
 
-class ServerAPI(metaclass=Singleton):
+class ServerAPI(Server):#, metaclass=Singleton):
     """
     RPC server class.
     """
 
-    def __init__(self, server_ip):
-        self.publisher = Publisher()
-        self.publisher.connect(server_ip)
+    def __init__(self, publisher, *args, **kwargs):
+        super(ServerAPI, self).__init__(*args, **kwargs)
+        self.publisher = publisher
 
     def undo(self):
         """
@@ -77,18 +77,25 @@ class ServerAPI(metaclass=Singleton):
 
         return data_dict
 
-def launch(server_ip=None, client_ip=None, block=True):
-    server_ip = server_ip or "tcp://127.0.0.1:4242"
-    client_ip = client_ip or "tcp://127.0.0.1:4243"
+def launch(server_address=None, publisher_address=None, block=True):
+    server_address = server_address or "tcp://127.0.0.1:4242"
+    publisher_address = publisher_address or "tcp://127.0.0.1:4243"
 
-    # Setup the puller service
-    server_api = ServerAPI(server_ip)
-    server = Server(server_api)
-    server.bind(client_ip)
+    # Establish the publisher service. This will send events to any
+    # subscribed services along the designated address.
+    publisher = Publisher()
+    publisher.connect(publisher_address)
+
+    # Setup the server service. This will be the api that clients
+    # will send events to.
+    server = ServerAPI(publisher)
+    server.bind(server_address)
 
     logging.info(
         "Server is now listening on %s and sending on %s.",
-        client_ip, server_ip)
+        server_address, publisher_address)
 
+    # Allow for stopping the server via ctrl-c
     gevent.signal(signal.SIGINT, server.stop)
+
     server.run() if block else gevent.spawn(server.run)
