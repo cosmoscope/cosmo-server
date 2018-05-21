@@ -1,5 +1,6 @@
 """Registries used in package."""
 import uuid
+from .store import Store
 
 
 class StoreRegistry(type):
@@ -9,13 +10,13 @@ class StoreRegistry(type):
     """
     def __call__(cls, *args, **kwargs):
         # Import in the call function to avoid circular imports
-        from ..core.store import Store
+        # from .store import store
 
         instance = super(StoreRegistry, cls).__call__(*args, **kwargs)
 
         # Assign the instance a unique identifier
         instance._identifier = str(uuid.uuid4())
 
-        self.register(instance)
+        store.register(instance)
 
         return instance

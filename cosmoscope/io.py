@@ -10,7 +10,7 @@ def data_loader(label, identifier=None):
     association gets stored in the astropy io registry.
     """
     def decorator(func):
-        from ..core.data import Data
+        from .data import Data
 
         logging.info("Added %s to custom loaders.", label)
         io_registry.register_reader(label, Data, func)
@@ -29,7 +29,7 @@ def custom_writer(label):
     association gets stored in the astropy io registry.
     """
     def decorator(func):
-        from ..core.data import Data
+        from .data import Data
 
         logging.info("Added %s to custom writers.", label)
         io_registry.register_writer(label, Data, func)

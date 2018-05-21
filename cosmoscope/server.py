@@ -5,20 +5,22 @@ import gevent
 import msgpack
 from zerorpc import Publisher, Puller, Pusher, Server
 import numpy as np
+import jsonpickle
 
-from .store import Store
+from .store import store
 from .data import Data
 from .operations.operation import Operation
+from .utils.singleton import Singleton
 
 __all__ = ['ServerAPI']
 
 
-class ServerAPI(Server):
+class ServerAPI(Server, metaclass=Singleton):
     """
     RPC server class.
     """
 
-    def __init__(self, publisher, *args, **kwargs):
+    def __init__(self, publisher=None, *args, **kwargs):
         super(ServerAPI, self).__init__(*args, **kwargs)
         self.publisher = publisher
 
@@ -48,6 +50,13 @@ class ServerAPI(Server):
 
         self.publisher.data_loaded(data.identifier)
 
+    def create_data(self, *args, **kwargs):
+        data = Data(*args, **kwargs)
+
+        self.publisher.data_created(data.identifier)
+
+        return data.identifier
+
     def query_loader_formats(self):
         """
         Returns a list of available data loader formats.
@@ -59,8 +68,8 @@ class ServerAPI(Server):
 
         return all_formats
 
-    def query_data(self, identifier, return_values):
-        data = Store()[identifier]
+    def query_data(self, identifier):
+        data = store[identifier]
 
         data_dict = {
             'name': data.name,
@@ -72,6 +81,16 @@ class ServerAPI(Server):
         }
 
         return data_dict
+
+    def query_data_attribute(self, identifier, name):
+        data = store[identifier]
+
+        data_attr = getattr(data, name)
+
+        packed_data_attr = data.encode(data_attr)
+
+        return packed_data_attr
+
 
 def launch(server_address=None, publisher_address=None, block=True):
     server_address = server_address or "tcp://127.0.0.1:4242"
