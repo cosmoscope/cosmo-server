@@ -6,5 +6,5 @@ gwcs==0.8.0
 jsonpickle==0.9.6
 msgpack_python==0.5.6
 numpy==1.14.3
-specutils
+specutils==0.5
 zerorpc==0.6.1
